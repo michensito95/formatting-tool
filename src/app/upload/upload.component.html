@@ -1,0 +1,3 @@
+<input type="file" (change)="onFileSelected($event)" />
+<button (click)="onUpload()" [disabled]="!selectedFile">Upload & Process Document</button>
+<a *ngIf="downloadLink" [href]="downloadLink" download="processed-document.docx">Download Processed Document</a>

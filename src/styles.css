@@ -1,0 +1,37 @@
+/* Global Styles */
+
+/* Body Styling */
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Use a modern, clean font */
+    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); /* Subtle gradient for depth */
+    color: #333; /* Dark text for contrast */
+    margin: 0; /* Remove default margin */
+    padding: 0; /* Remove default padding */
+  }
+  
+  /* Link Styling */
+  a {
+    text-decoration: none; /* Remove underline from links */
+  }
+  
+  a:hover {
+    text-decoration: underline; /* Underline on hover */
+  }
+  
+  /* Button Styles */
+  .btn {
+    border-radius: 25px; /* Rounded corners for buttons */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+  }
+  
+  .btn:hover {
+    background-color: #0056b3; /* Darker blue on hover */
+    transform: scale(1.05); /* Slightly enlarge button on hover */
+  }
+  
+  /* Feedback Messages */
+  .feedback-message {
+    margin: 20px 0;
+    font-size: 1.2rem; /* Slightly larger font for visibility */
+  }
+  
