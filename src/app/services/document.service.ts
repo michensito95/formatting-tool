@@ -70,6 +70,7 @@ export class DocumentService {
             ? element.innerText
             : `${element.innerText};Y;N;N;;Y;`;
           paragraphOptions.text = textContent; // For H5
+          paragraphOptions.heading = HeadingLevel.HEADING_5; // Set the heading level to HEADING_5
           break;
         case 'P':
           // Additional processing for paragraphs can be added here if needed
