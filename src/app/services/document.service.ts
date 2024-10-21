@@ -61,7 +61,7 @@ export class DocumentService {
           break;
         case 'H2':
           paragraphOptions.heading = HeadingLevel.HEADING_2;
-          break;
+          break; 
         case 'H3':
           paragraphOptions.heading = HeadingLevel.HEADING_3;
           break;
