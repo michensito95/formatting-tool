@@ -21,6 +21,9 @@
     "lib": [
       "ES2022",
       "dom"
+    ],
+    "typeRoots": [
+     
     ]
   },
   "angularCompilerOptions": {
@@ -32,7 +35,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.html",
-    "src/typings/**/*.d.ts" // Include custom typings
+    "src/@types/**/*.d.ts" 
+    
   ]
 }
 
