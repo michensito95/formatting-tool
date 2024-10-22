@@ -6,6 +6,7 @@ import { AppComponent } from './app.component';
 import { UploadComponent } from './upload/upload.component';
 import { FeedbackComponent } from './feedback/feedback.component';
 import { DocumentService } from './services/document.service';
+import { LessonUploadComponent } from './lesson-upload/lesson-upload.component';
 
 
 @NgModule({
@@ -13,6 +14,7 @@ import { DocumentService } from './services/document.service';
     AppComponent,
     UploadComponent,
     FeedbackComponent,
+    LessonUploadComponent,
   ],
   imports: [
     BrowserModule,

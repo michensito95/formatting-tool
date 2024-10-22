@@ -1,37 +1,84 @@
-/* Global Styles */
+/* styles.css */
+html, body {
+  height: 100%; /* Ensure the full height is covered */
+  margin: 0; /* Remove default margin */
+  background-color: #121212; /* Dark background */
+  color: #e0e0e0; /* Default text color */
+  font-family: 'Titillium Web', sans-serif; /* Global font */
+}
 
-/* Body Styling */
-body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Use a modern, clean font */
-    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); /* Subtle gradient for depth */
-    color: #333; /* Dark text for contrast */
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-  }
-  
-  /* Link Styling */
-  a {
-    text-decoration: none; /* Remove underline from links */
-  }
-  
-  a:hover {
-    text-decoration: underline; /* Underline on hover */
-  }
-  
-  /* Button Styles */
-  .btn {
-    border-radius: 25px; /* Rounded corners for buttons */
-    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
-  }
-  
-  .btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: scale(1.05); /* Slightly enlarge button on hover */
-  }
-  
-  /* Feedback Messages */
-  .feedback-message {
-    margin: 20px 0;
-    font-size: 1.2rem; /* Slightly larger font for visibility */
-  }
-  
+/* Card styles */
+.card {
+  background-color: #1f1f1f; /* Dark card background */
+  border: none;
+  border-radius: 0.5rem; /* Rounded corners */
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Depth with shadow */
+  transition: none /* Smooth transform on hover */
+}
+
+
+
+/* Text styles */
+h1 {
+  font-weight: 700; /* Bold for headers */
+  font-size: 2.5rem; /* Size for h1 */
+}
+
+h5 {
+  font-weight: 600; /* Slightly bold */
+}
+
+/* Button styles */
+.btn {
+  border-radius: 0.5rem; /* Rounded button corners */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition */
+}
+
+.btn-outline-light {
+  border-color: #f5f5f5;
+  color: #f5f5f5;
+}
+
+.btn-outline-light:hover {
+  background-color: #f5f5f5;
+  color: #121212;
+}
+
+.btn-light {
+  background-color: #3b3b3b;
+  color: #f5f5f5;
+}
+
+.btn-light:hover {
+  background-color: #4a4a4a; /* Darker on hover */
+}
+
+.btn-success {
+  background-color: #4caf50;
+  border-radius: 0.5rem; /* Rounded corners */
+}
+
+.btn-success:hover {
+  background-color: #45a049; /* Darker green on hover */
+}
+
+/* Custom file input label */
+.custom-file-label {
+  background-color: #3b3b3b;
+  color: #f5f5f5;
+}
+
+/* Focused input styles */
+.custom-file-input:focus ~ .custom-file-label {
+  border-color: #4caf50;
+}
+
+/* Font sizes for readability */
+body, p, div, span, a, button, h2, h3, h4, h5, h6 {
+  font-size: 1rem; /* Base size */
+}
+
+/* Additional styling for headers */
+h2, h3, h4, h5, h6 {
+  margin-bottom: 1rem; /* Spacing below headers */
+}

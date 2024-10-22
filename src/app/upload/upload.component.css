@@ -1,45 +1,97 @@
+/* Styles for the overall upload component */
 .upload-container {
-  max-width: 600px;
-  margin: 0 auto;
-  background-color: #f8f9fa;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-color: #1f1f1f; /* Dark background */
+  border-radius: 5px; /* Rounded corners */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); /* Shadow for depth */
+  padding: 2rem; /* Internal padding */
 }
 
-.upload-box {
-  border: 2px dashed #dee2e6;
-  border-radius: 10px;
-  background-color: #ffffff;
+/* Input and label styles */
+.custom-file-label {
+  margin-top: 10px; /* Add space above the label */
 }
 
-.upload-box p {
-  font-size: 1.2rem;
-  color: #6c757d;
+.form-control {
+  margin-bottom: 10px; /* Add space below the input */
 }
 
-.upload-box button {
-  background-color: #007bff;
-  border-color: #007bff;
+/* Button styles */
+.btn {
+  border-radius: 10px; /* More rounded corners */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+  padding: 10px 20px; /* More padding for better click area */
+  letter-spacing: 0.5px; /* Space between letters */
 }
 
-.uploaded-files .file-item {
-  padding: 10px;
-  background-color: #ffffff;
-  border: 1px solid #dee2e6;
-  border-radius: 5px;
+/* Success button */
+.btn-success {
+  background-color: #4caf50; /* Green for success */
+  border-color: #4caf50; /* Border color */
 }
 
-.file-item i {
-  font-size: 1.5rem;
+/* Hover effects for success button */
+.btn-success:hover {
+  background-color: #66bb6a; /* Lighter green on hover */
+  transform: scale(1.05); /* Slight scaling effect */
 }
 
-.progress {
-  width: 150px;
-  height: 20px;
-  background-color: #e9ecef;
-  border-radius: 10px;
+/* Outline button */
+.btn-outline-light {
+  border-color: #f5f5f5; /* Outline color */
+  color: #f5f5f5; /* Text color */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
 }
 
-.progress-bar {
-  background-color: #007bff;
+/* Hover effects for outline button */
+.btn-outline-light:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Lighten on hover */
+  transform: scale(1.05); /* Slight scaling effect */
+}
+
+/* Ripple effect for buttons */
+.btn-success::after, .btn-outline-light::after {
+  content: ''; /* Empty content for the pseudo-element */
+  position: absolute; /* Absolute positioning */
+  top: 50%; /* Center vertically */
+  left: 50%; /* Center horizontally */
+  width: 300%; /* Larger width for ripple */
+  height: 300%; /* Larger height for ripple */
+  background: rgba(255, 255, 255, 0.3); /* Light white for ripple effect */
+  border-radius: 20%; /* Circular ripple */
+  transform: translate(-50%, -50%) scale(0); /* Start small and centered */
+  transition: transform 0.5s ease; /* Smooth transition for the ripple */
+  pointer-events: none; /* Prevent interaction with the pseudo-element */
+}
+
+/* Ensure ripple effect works on hover */
+.btn-success:hover::after, .btn-outline-light:hover::after {
+  transform: translate(-50%, -50%) scale(1); /* Expand the ripple on hover */
+}
+/* Hide the default file input */
+input[type="file"] {
+  display: none; /* Hide the input itself */
+}
+
+/* Style the label to look like a button */
+.custom-file-label {
+  display: inline-block; /* Make label inline */
+  cursor: pointer; /* Pointer cursor on hover */
+  background-color: #4caf50; /* Green background */
+  color: white; /* White text */
+  border-radius: 10px; /* Rounded edges */
+  padding: 10px 20px; /* Padding for better click area */
+  width: 100%; /* Full width */
+  text-align: center; /* Center text */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transitions */
+}
+
+/* Hover effect for the label */
+.custom-file-label:hover {
+  background-color: #66bb6a; /* Lighter green on hover */
+  transform: scale(1.05); /* Slight scaling effect */
+}
+
+/* Ensure the input is triggered when clicking the label */
+.custom-file-label[for="fileInput"] {
+  position: relative; /* Needed for click event to target the input */
 }
