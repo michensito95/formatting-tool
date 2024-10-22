@@ -113,6 +113,30 @@ export class DocumentService {
                     ? element.innerText
                     : `${element.innerText};Y;N;VR;;Y;`; // Append YNN method
                 break;
+            case 'UL':
+                // Handle unordered list (ul)
+                const ulItems = Array.from(element.children);
+                ulItems.forEach((li) => {
+                    if (li.tagName === 'LI') {
+                        const listItem = li as HTMLElement; // Cast li to HTMLElement
+                        paragraphs.push(new Paragraph({
+                            text: `• ${listItem.innerText}`, // Bullet point with a bullet symbol
+                        }));
+                    }
+                });
+                break;
+            case 'OL':
+                // Handle ordered list (ol)
+                const olItems = Array.from(element.children);
+                olItems.forEach((li, index) => {
+                    if (li.tagName === 'LI') {
+                        const listItem = li as HTMLElement; // Cast li to HTMLElement
+                        paragraphs.push(new Paragraph({
+                            text: `${index + 1}. ${listItem.innerText}`, // Numbered point
+                        }));
+                    }
+                });
+                break;
             case 'P':
                 // Add regular paragraphs, but also count the words
                 const wordsInParagraph = element.innerText.split(/\s+/).length;
