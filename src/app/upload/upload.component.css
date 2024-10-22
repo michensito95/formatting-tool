@@ -64,9 +64,7 @@
 }
 
 /* Ensure ripple effect works on hover */
-.btn-success:hover::after, .btn-outline-light:hover::after {
-  transform: translate(-50%, -50%) scale(1); /* Expand the ripple on hover */
-}
+
 /* Hide the default file input */
 input[type="file"] {
   display: none; /* Hide the input itself */
