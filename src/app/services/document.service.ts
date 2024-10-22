@@ -1,10 +1,8 @@
 import { Injectable } from '@angular/core';
-import PizZip from 'pizzip';
-import Docxtemplater from 'docxtemplater';
 import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import * as mammoth from 'mammoth';
-import { Quiz } from '../models/quiz.model'; 
+
 
 
 @Injectable({
