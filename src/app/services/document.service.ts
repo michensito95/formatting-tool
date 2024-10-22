@@ -60,7 +60,10 @@ export class DocumentService {
 
   private processHtmlElements(elements: HTMLElement[]): Paragraph[] {
     const paragraphs: Paragraph[] = [];
+    let lastH2Text: string | null = null; // Store the last processed H2 text
     let lastH3Text: string | null = null; // Store the last processed H3 text
+    let currentWordCount = 0; // Track the current word count
+    let currentH5Text: string | null = null; // Store the current H5 text for repetition
 
     for (let i = 0; i < elements.length; i++) {
         const element = elements[i];
@@ -76,57 +79,70 @@ export class DocumentService {
                 paragraphOptions.heading = HeadingLevel.HEADING_1;
                 break;
             case 'H2':
-                paragraphOptions.heading = HeadingLevel.HEADING_2;
+                // Process H2: store the text and create an H5
+                lastH2Text = element.innerText; // Store the last processed H2 text
+                currentH5Text = `${lastH2Text}. Y;N;N;VR;;Y;`; // H5 text derived from H2
+                paragraphs.push(new Paragraph({
+                    text: lastH2Text,
+                    heading: HeadingLevel.HEADING_2,
+                }));
+                // Add the H5 for the H2
+                paragraphs.push(new Paragraph({
+                    text: currentH5Text,
+                    heading: HeadingLevel.HEADING_5,
+                }));
+                currentWordCount = 0; // Reset the word count for the new section
                 break;
             case 'H3':
-                // Check if this H3 has already been processed
+                // Process H3: store the text and create an H5
                 if (lastH3Text !== element.innerText) {
-                    // Add the original H3
                     lastH3Text = element.innerText; // Store the last processed H3 text
                     paragraphs.push(new Paragraph({
                         text: lastH3Text,
                         heading: HeadingLevel.HEADING_3,
                     }));
-
                     // Add the corresponding H5 based on the last processed H3
                     paragraphs.push(new Paragraph({
                         text: `${lastH3Text}. Y;N;N;VR;;Y;`, // H5 text derived from H3 with YNN format
                         heading: HeadingLevel.HEADING_5,
                     }));
+                    currentWordCount = 0; // Reset the word count for the new section
                 }
                 break;
             case 'H5':
-                // Only process H5 if it does not match the last H3
-                // This ensures we don't duplicate content.
-                if (element.innerText !== lastH3Text) {
-                    const textContent = element.innerText.includes('Activity')
-                        ? element.innerText
-                        : `${element.innerText};Y;N;VR;;Y;`; // Append YNN method
-                    paragraphOptions.text = textContent; // For H5
-                    paragraphOptions.heading = HeadingLevel.HEADING_5;
-                }
+                // Set the current H5 text for repetition
+                currentH5Text = element.innerText.includes('Activity')
+                    ? element.innerText
+                    : `${element.innerText};Y;N;VR;;Y;`; // Append YNN method
                 break;
             case 'P':
-                // Add regular paragraphs, but only if they are not duplicates of H3
-                if (element.innerText !== lastH3Text) {
+                // Add regular paragraphs, but also count the words
+                const wordsInParagraph = element.innerText.split(/\s+/).length;
+                currentWordCount += wordsInParagraph;
+
+                // Add the paragraph to the document
+                paragraphs.push(new Paragraph({
+                    text: element.innerText,
+                }));
+
+                // Check if we need to repeat the last H5
+                if (currentH5Text && currentWordCount >= 200) {
                     paragraphs.push(new Paragraph({
-                        text: element.innerText,
+                        text: currentH5Text,
+                        heading: HeadingLevel.HEADING_5,
                     }));
+                    currentWordCount = 0; // Reset word count after repeating the H5
                 }
                 break;
             default:
                 console.warn("Unhandled element type:", element.tagName); // Warn for unhandled element types
-        }
-
-        // Create a new Paragraph instance for the current element
-        if (paragraphOptions.text) {
-            const paragraph = new Paragraph(paragraphOptions);
-            paragraphs.push(paragraph); // Push the paragraph to the array
         }
     }
 
     console.log("Generated Paragraphs:", paragraphs); // Log the generated paragraphs
     return paragraphs; // Return the array of paragraphs
 }
+
+
 
 }
