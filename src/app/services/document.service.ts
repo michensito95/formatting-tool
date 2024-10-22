@@ -1,9 +1,11 @@
 import { Injectable } from '@angular/core';
 import PizZip from 'pizzip';
 import Docxtemplater from 'docxtemplater';
-import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, HeadingLevel, TextRun } from 'docx';
 import { saveAs } from 'file-saver';
 import * as mammoth from 'mammoth';
+import { Quiz } from '../models/quiz.model'; 
+
 
 @Injectable({
   providedIn: 'root',
@@ -56,51 +58,75 @@ export class DocumentService {
     return downloadLink; // Return the download link
   }
 
-  // Helper method to process HTML elements and convert them into Paragraphs
   private processHtmlElements(elements: HTMLElement[]): Paragraph[] {
     const paragraphs: Paragraph[] = [];
+    let lastH3Text: string | null = null; // Store the last processed H3 text
 
     for (let i = 0; i < elements.length; i++) {
-      const element = elements[i];
-      console.log("Processing element:", element); // Log the element being processed
+        const element = elements[i];
+        console.log("Processing element:", element); // Log the element being processed
 
-      const paragraphOptions: any = {
-        text: element.innerText, // Default text content
-      };
+        const paragraphOptions: any = {
+            text: element.innerText, // Default text content
+        };
 
-      // Apply heading levels based on the tag
-      switch (element.tagName) {
-        case 'H1':
-          paragraphOptions.heading = HeadingLevel.HEADING_1;
-          break;
-        case 'H2':
-          paragraphOptions.heading = HeadingLevel.HEADING_2;
-          break;
-        case 'H3':
-          paragraphOptions.heading = HeadingLevel.HEADING_3;
-          break;
-        case 'H5':
-          const textContent = element.innerText.includes('Activity')
-            ? element.innerText
-            : `${element.innerText};Y;N;N;;Y;`; // Append YNN method
-          paragraphOptions.text = textContent; // For H5
-          paragraphOptions.heading = HeadingLevel.HEADING_5;
-          break;
-        case 'P':
-          // Additional processing for paragraphs can be added here if needed
-          break;
-        default:
-          console.warn("Unhandled element type:", element.tagName); // Warn for unhandled element types
-      }
+        // Apply heading levels based on the tag
+        switch (element.tagName) {
+            case 'H1':
+                paragraphOptions.heading = HeadingLevel.HEADING_1;
+                break;
+            case 'H2':
+                paragraphOptions.heading = HeadingLevel.HEADING_2;
+                break;
+            case 'H3':
+                // Check if this H3 has already been processed
+                if (lastH3Text !== element.innerText) {
+                    // Add the original H3
+                    lastH3Text = element.innerText; // Store the last processed H3 text
+                    paragraphs.push(new Paragraph({
+                        text: lastH3Text,
+                        heading: HeadingLevel.HEADING_3,
+                    }));
 
-      // Create a new Paragraph instance
-      if (paragraphOptions.text) {
-        const paragraph = new Paragraph(paragraphOptions);
-        paragraphs.push(paragraph); // Push the paragraph to the array
-      }
+                    // Add the corresponding H5 based on the last processed H3
+                    paragraphs.push(new Paragraph({
+                        text: `${lastH3Text}. Y;N;N;VR;;Y;`, // H5 text derived from H3 with YNN format
+                        heading: HeadingLevel.HEADING_5,
+                    }));
+                }
+                break;
+            case 'H5':
+                // Only process H5 if it does not match the last H3
+                // This ensures we don't duplicate content.
+                if (element.innerText !== lastH3Text) {
+                    const textContent = element.innerText.includes('Activity')
+                        ? element.innerText
+                        : `${element.innerText};Y;N;VR;;Y;`; // Append YNN method
+                    paragraphOptions.text = textContent; // For H5
+                    paragraphOptions.heading = HeadingLevel.HEADING_5;
+                }
+                break;
+            case 'P':
+                // Add regular paragraphs, but only if they are not duplicates of H3
+                if (element.innerText !== lastH3Text) {
+                    paragraphs.push(new Paragraph({
+                        text: element.innerText,
+                    }));
+                }
+                break;
+            default:
+                console.warn("Unhandled element type:", element.tagName); // Warn for unhandled element types
+        }
+
+        // Create a new Paragraph instance for the current element
+        if (paragraphOptions.text) {
+            const paragraph = new Paragraph(paragraphOptions);
+            paragraphs.push(paragraph); // Push the paragraph to the array
+        }
     }
 
     console.log("Generated Paragraphs:", paragraphs); // Log the generated paragraphs
     return paragraphs; // Return the array of paragraphs
-  }
+}
+
 }
