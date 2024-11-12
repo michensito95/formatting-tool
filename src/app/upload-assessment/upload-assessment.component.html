@@ -1,14 +1,12 @@
 <div class="card bg-white text-light p-4 upload-container">
-    <h2 class="text-center">Upload Your Assessment FTC</h2>
-    <div class="mb-3">
-      <input type="file" class="form-control" (change)="onFileSelected($event)" id="assessmentFileInput"/>
-      <label class="custom-file-label" for="fileInput">Choose a file...</label>
-    </div>
-    <button (click)="onUpload()" [disabled]="!selectedFile">
-      <i class="fas fa-upload"></i> Upload & Process
-    </button>
-    <a *ngIf="downloadLink" class="btn btn-outline-light w-100" [href]="downloadLink" download="processed-assessment.docx">
-      <i class="fas fa-download"></i> Download Processed Assessment FTC
-    </a>
+  <h2 class="text-center">Upload Your Assessment FTC</h2>
+  <div class="mb-3">
+    <input type="file" class="form-control" (change)="onFileSelected($event)" id="fileInput"/>
+    <label class="custom-file-label" for="fileInput">Choose a file...</label>
   </div>
-   
+  <button (click)="onUpload()" [disabled]="!selectedFile">
+    <i class="fas fa-upload"></i> Upload & Process 
+  </button>
+  <a *ngIf="downloadLink" [href]="downloadLink" download="processed-document.docx">
+  </a>
+</div>

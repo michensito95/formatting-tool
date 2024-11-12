@@ -159,41 +159,105 @@ export class DocumentService {
   // Method to process the assessment document
   processAssessmentDocument(elements: HTMLElement[]): docx.Paragraph[] {
     const paragraphs: docx.Paragraph[] = [];
-
+  
+    // Loop through all elements in the parsed HTML
     elements.forEach((element: HTMLElement) => {
-        if (element.tagName === 'P') {
-            const text = element.textContent?.trim() || '';
-
-            if (text.startsWith('Question:')) {
-                // For Question (apply custom Heading1 style)
-                paragraphs.push(new docx.Paragraph({
-                    text: text.replace('Question:', '').trim(),
-                    style: 'Heading1', // Apply custom Heading1 style
-                    heading: docx.HeadingLevel.HEADING_1, // Use HEADING_1 for H10
-                }));
-            } else if (text.startsWith('Answer:')) {
-                // For Answer (apply custom Heading2 style and bullet points)
-                paragraphs.push(new docx.Paragraph({
-                    text: text.replace('Answer:', '').trim(),
-                    style: 'ListBullet', // Bullet points style
-                    bullet: { level: 0 }, // Apply bullet points with level 0
-                }));
-            } else if (text.startsWith('Feedback:') || text.startsWith('Comment:')) {
-                // For Feedback (apply custom Heading2 style)
-                paragraphs.push(new docx.Paragraph({
-                    text: text.replace('Feedback:', '').replace('Comment:', '').trim(),
-                    style: 'Heading2', // Apply custom Heading2 style
-                    heading: docx.HeadingLevel.HEADING_2, // Use HEADING_2 for H12
-                }));
-            }
+      const text = element.textContent?.trim() || '';
+  
+      if (element.tagName === 'P') {
+        // Handling Questions (custom style H9)
+        if (text.startsWith('Question:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Question:', '').trim(),
+            style: 'CustomHeading9', // Apply custom style for H9 (Title)
+          }));
         }
+        // Handling Answers (custom style H10)
+        else if (text.startsWith('Answer:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Answer:', '').trim(),
+            style: 'CustomHeading10', // Apply custom style for H10 (Answers)
+            bullet: { level: 0 }, // Bullet points for answers
+          }));
+        }
+        // Handling Feedback or Comments (custom style H11)
+        else if (text.startsWith('Feedback:') || text.startsWith('Comment:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Feedback:', '').replace('Comment:', '').trim(),
+            style: 'CustomHeading11', // Apply custom style for H11 (Feedback)
+          }));
+        }
+      }
+      // Handle any unordered list (UL) and ordered list (OL) elements
+      else if (element.tagName === 'UL') {
+        const ulItems = Array.from(element.children);
+        ulItems.forEach((li) => {
+          if (li.tagName === 'LI') {
+            const listItem = li as HTMLElement;
+            paragraphs.push(new docx.Paragraph({
+              text: `• ${listItem.innerText}`, // Bullet point for each list item
+            }));
+          }
+        });
+      }
+      else if (element.tagName === 'OL') {
+        const olItems = Array.from(element.children);
+        olItems.forEach((li, index) => {
+          if (li.tagName === 'LI') {
+            const listItem = li as HTMLElement;
+            paragraphs.push(new docx.Paragraph({
+              text: `${index + 1}. ${listItem.innerText}`, // Numbered point
+            }));
+          }
+        });
+      }
     });
-
+  
     return paragraphs;
-}
-
-
-
+  }
+  generateAssessmentDocument(paragraphs: docx.Paragraph[]): docx.Document {
+    return new docx.Document({
+      styles: {
+        paragraphStyles: [
+          {
+            id: 'Heading9',
+            name: 'Heading 9',
+            basedOn: 'Heading1',
+            next: 'Normal',
+            run: { font: 'Calibri', size: 24, bold: true },
+          },
+          {
+            id: 'Heading10',
+            name: 'Heading 10',
+            basedOn: 'Heading2',
+            next: 'Normal',
+            run: { font: 'Calibri', size: 22, bold: false },
+          },
+          {
+            id: 'Heading11',
+            name: 'Heading 11',
+            basedOn: 'Heading3',
+            next: 'Normal',
+            run: { font: 'Calibri', size: 20 },
+          },
+          {
+            id: 'Heading12',
+            name: 'Heading 12',
+            basedOn: 'Heading4', // You can change this to whatever suits your hierarchy
+            next: 'Normal',
+            run: { font: 'Calibri', size: 18 },
+        },
+        ],
+      },
+      sections: [
+        {
+          properties: {},
+          children: paragraphs,
+        },
+      ],
+    });
+  }
+  
   // Method to process the file and format it as a docx document
   processFile(file: File, isAssessment: boolean): Promise<Blob> {
     return new Promise((resolve, reject) => {
@@ -214,18 +278,22 @@ export class DocumentService {
                     console.log("Parsed Elements Length:", elements.length); // Log the number of elements
                     console.log("Parsed Elements:", elements); // Log the actual elements
                     
+                    // Process the document differently for assessment or course
                     const paragraphs = isAssessment
                         ? this.processAssessmentDocument(elements)
                         : this.processCourseDocument(elements);
 
-                    const docxDocument = new docx.Document({
-                        sections: [
-                            {
-                                properties: {},
-                                children: paragraphs,
-                            },
-                        ],
-                    });
+                    // If the document is an assessment, use generateAssessmentDocument
+                    const docxDocument = isAssessment
+                        ? this.generateAssessmentDocument(paragraphs)  // Custom function for assessment documents
+                        : new docx.Document({
+                            sections: [
+                                {
+                                    properties: {},
+                                    children: paragraphs,
+                                },
+                            ],
+                        });
 
                     docx.Packer.toBlob(docxDocument).then((blob: Blob) => {
                         console.log("Generated Blob:", blob); // Log Blob details
@@ -238,6 +306,7 @@ export class DocumentService {
         reader.readAsArrayBuffer(file);
     });
 }
+
 
 
   // Method to download the formatted document
