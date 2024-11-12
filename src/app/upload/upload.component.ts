@@ -32,7 +32,7 @@ export class UploadComponent {
         const url = window.URL.createObjectURL(this.downloadLink);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'processed-document.docx'; // Set the default file name
+        a.download = `Processed_${this.selectedFile.name}`; // Correct file name format
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);

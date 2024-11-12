@@ -1,19 +1,12 @@
-<<<<<<< Updated upstream
-<input type="file" (change)="onFileSelected($event)" />
-<button (click)="onUpload()" [disabled]="!selectedFile">Upload & Process Document</button>
-<a *ngIf="downloadLink" [href]="downloadLink" download="processed-document.docx">Download Processed Document</a>
-=======
-<div class="card bg-dark text-light p-4 upload-container">
-  <h2 class="text-center">Upload Your Course Document</h2>
+<div class="card bg-white text-light p-4 upload-container">
+  <h2 class="text-center">Upload Your Course FTC</h2>
   <div class="mb-3">
-    <input type="file" class="form-control" (change)="onFileSelected($event)" id="fileInput" style="display: none;"/>
-    <label class="custom-file-label" for="fileInput">Choose file...</label>
+    <input type="file" class="form-control" (change)="onFileSelected($event)" id="fileInput"/>
+    <label class="custom-file-label" for="fileInput">Choose a file...</label>
   </div>
-  <button class="btn btn-success w-100 mb-2" (click)="onUpload()" [disabled]="!selectedFile">
-    <i class="fas fa-upload"></i> Upload & Process Document
+  <button (click)="onUpload()" [disabled]="!selectedFile">
+    <i class="fas fa-upload"></i> Upload & Process 
   </button>
-  <a *ngIf="downloadLink" class="btn btn-outline-light w-100" [href]="downloadLink" download="processed-document.docx">
-    <i class="fas fa-download"></i> Download Processed Document
+  <a *ngIf="downloadLink" [href]="downloadLink" download="processed-document.docx">
   </a>
 </div>
->>>>>>> Stashed changes
