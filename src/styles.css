@@ -1,37 +1,146 @@
 /* Global Styles */
+@import url('https://fonts.googleapis.com/css2?family=Francois+One&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Gantari:ital,wght@0,100..900;1,100..900&display=swap");
+/* Body Styling */
+body {
+  font-family: "Gantari", serif;
+  background: linear-gradient(
+    135deg,
+    #f5f5f5 0%,
+    #e0e0e0 100%
+  ); /* Subtle gradient for depth */
+  color: #333; /* Dark text for contrast */
+  margin: 0; /* Remove default margin */
+  padding: 0; /* Remove default padding */
+}
+
+/* Link Styling */
+a {
+  text-decoration: none; /* Remove underline from links */
+}
+
+a:hover {
+  text-decoration: underline; /* Underline on hover */
+}
+
+/* Button Styles */
+.btn {
+  border-radius: 10px; /* Rounded corners for buttons */
+  transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
+}
+
+.btn:hover {
+  background-color: #349bdfd7; /* Darker blue on hover */
+  transform: scale(1.05); /* Slightly enlarge button on hover */
+}
+
+/* Global Styles */
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 /* Body Styling */
 body {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; /* Use a modern, clean font */
-    background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%); /* Subtle gradient for depth */
-    color: #333; /* Dark text for contrast */
-    margin: 0; /* Remove default margin */
-    padding: 0; /* Remove default padding */
-  }
-  
-  /* Link Styling */
-  a {
-    text-decoration: none; /* Remove underline from links */
-  }
-  
-  a:hover {
-    text-decoration: underline; /* Underline on hover */
-  }
-  
-  /* Button Styles */
-  .btn {
-    border-radius: 25px; /* Rounded corners for buttons */
-    transition: background-color 0.3s, transform 0.2s; /* Smooth transition */
-  }
-  
-  .btn:hover {
-    background-color: #0056b3; /* Darker blue on hover */
-    transform: scale(1.05); /* Slightly enlarge button on hover */
-  }
-  
-  /* Feedback Messages */
-  .feedback-message {
-    margin: 20px 0;
-    font-size: 1.2rem; /* Slightly larger font for visibility */
-  }
-  
+  font-family: "Gantari", serif;
+  background-color: #f7f7f7; /* Light grey background */
+  color: #333; /* Dark text color */
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+  outline: none;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 20px;
+  padding: 0;
+  font-family: "Francois One", sans-serif;
+  color: #333;
+}
+
+h1 {
+  font-size: 36px;
+}
+
+h2 {
+  font-size: 30px;
+}
+
+h3 {
+  font-size: 24px;
+}
+
+/* Flexbox Container */
+.flex-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Add some spacing */
+.container {
+  padding: 20px;
+}
+
+/* Button Styling */
+button {
+  background-color: #ffa500; /* Orange background */
+  color: #fff; /* White text */
+  border: 1px solid #ffa500; /* Orange border */
+  border-radius: 4px; /* Slightly rounded corners */
+  padding: 10px 20px; /* Padding for better click area */
+  font-size: 16px; /* Adjust font size */
+  cursor: pointer; /* Pointer cursor on hover */
+  transition: background-color 0.3s ease, transform 0.2s ease; /* Smooth transition on hover */
+}
+
+/* Hover effect for buttons */
+button:hover {
+  background-color: #ff7f00; /* Slightly darker orange on hover */
+  transform: scale(1.05); /* Slight scaling effect */
+}
+
+input[type="file"] {
+  display: none;
+}
+.custom-file-label {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background-color: #e6e6e6; /* Slightly darker than background */
+  border: 1px solid #ccc; /* Light grey border */
+  color: #333;
+  text-align: left;
+  cursor: pointer;
+  border-radius: 8px; /* Rounded edges */
+  transition: background-color 0.3s ease, border-color 0.3s ease; /* Smooth transitions */
+}
+
+.custom-file-label:hover {
+  background-color: #d4d4d4; /* Darker grey on hover */
+  border-color: #ffa500; /* Orange accent for hover border */
+}
+
+.custom-file-label:active {
+  background-color: #ff7f00; /* Orange for active click */
+  color: #fff; /* White text on click */
+}

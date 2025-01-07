@@ -1,0 +1,124 @@
+/* Full height layout without scrolling */
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #f7f7f7; /* Light background color */
+}
+
+/* Main container - full page layout */
+.main-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  width: 100%;
+  max-width: 1200px; /* Optional max-width */
+  padding: 20px;
+  box-sizing: border-box; /* Include padding in width calculation */
+  height: 100%; /* Full height */
+  transition: transform 0.5s ease-out; /* Smooth transition for moving content */
+}
+
+/* Main heading styling */
+.main-heading {
+  text-align: center;
+  margin-bottom: 20px; /* Space between the title and buttons */
+  transition: margin-top 0.5s ease-out, opacity 0.5s ease-out; /* Smooth animation */
+}
+
+/* Logo and heading container */
+.image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 20px; /* Space between logo and title */
+  transition: opacity 0.5s ease-out; /* Fade effect */
+}
+
+/* Logo - will fade out when hidden */
+.logo {
+  width: 150px; /* Adjust the size of the logo */
+  height: auto;
+  margin-bottom: 10px; /* Space between logo and title */
+  transition: opacity 0.5s ease-out; /* Fade out effect */
+}
+
+/* Heading text */
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+/* Button group layout */
+.button-group {
+  display: flex;
+  justify-content: space-evenly;
+  gap: 20px;
+  flex-wrap: wrap; /* Allow buttons to wrap on smaller screens */
+  width: 100%; /* Full width */
+}
+
+/* Button container */
+.button-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 300px; /* Set width for each button container */
+  text-align: center;
+  opacity: 0; /* Start with buttons hidden */
+  animation: fadeInUp 1s forwards; /* Animation to fade in and move up */
+}
+
+.upload-container {
+  margin-top: 10px; /* Space between the button and upload area */
+  max-height: 50vh; /* Maximum height for expanded content */
+  overflow-y: auto; /* Allow vertical scroll if the content exceeds the max height */
+}
+
+/* Button styling */
+.btn {
+  width: 100%; /* Button takes full width */
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 5px;
+  background-color: #ff7f00; /* Orange button color */
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #ff5700; /* Darker orange on hover */
+}
+
+/* Optional: Keep the button color when expanded */
+.expanded {
+  background-color: #ff5700;
+}
+
+/* Keyframe animation for fading in and moving up */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px); /* Start slightly below */
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0); /* Move to original position */
+  }
+}
+
+/* Class to hide the logo and adjust layout */
+.logo-hidden .main-heading {
+  margin-top: -200px; /* Move title much higher for more space */
+}
+
+.logo-hidden .image-container {
+  opacity: 0; /* Hide logo */
+}
+
+.logo-hidden .logo {
+  opacity: 0; /* Hide the logo with fade-out */
+}

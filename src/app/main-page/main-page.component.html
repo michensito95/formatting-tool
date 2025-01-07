@@ -1,0 +1,41 @@
+<div class="container main-container" [ngClass]="{'logo-hidden': isLogoHidden}">
+  <div class="main-heading">
+    <div class="image-container">
+      <img class="logo" src="assets/360logo.png" alt="360logo" />
+    </div>
+    <h1>What do you want to do today?</h1>
+  </div>
+
+  <!-- Flex container to hold both buttons side by side -->
+  <div class="button-group">
+    <!-- Course Formatting Button and Upload Area -->
+    <div class="button-container">
+      <button
+        class="btn btn-orange"
+        (click)="toggleCourseFormatting()"
+        [ngClass]="{'expanded': isCourseExpanded}">
+        Course Formatting
+      </button>
+
+      <!-- Course Formatting Upload Area -->
+      <div *ngIf="isCourseExpanded" class="upload-container">
+        <app-upload></app-upload>
+      </div>
+    </div>
+
+    <!-- Assessment Formatting Button and Upload Area -->
+    <div class="button-container">
+      <button
+        class="btn btn-orange"
+        (click)="toggleAssessmentFormatting()"
+        [ngClass]="{'expanded': isAssessmentExpanded}">
+        Assessment Formatting
+      </button>
+
+      <!-- Assessment Formatting Upload Area -->
+      <div *ngIf="isAssessmentExpanded" class="upload-container">
+        <app-upload-assessment></app-upload-assessment>
+      </div>
+    </div>
+  </div>
+</div>

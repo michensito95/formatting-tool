@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { DocumentService } from '../services/document.service';
 
 @Component({
-  selector: 'app-upload',
-  templateUrl: './upload.component.html',
-  styleUrls: ['./upload.component.css']
+  selector: 'app-upload-assessment',
+  templateUrl: './upload-assessment.component.html',
+  styleUrls: ['./upload-assessment.component.css']
 })
-export class UploadComponent {
+export class UploadAssessmentComponent {  // or UploadComponent
   selectedFile: File | null = null;
   downloadLink: Blob | null = null;  // Change type from string to Blob
 
@@ -24,7 +24,7 @@ export class UploadComponent {
   async onUpload(): Promise<void> {
     if (this.selectedFile) {
       // Call the processDocument method to handle the file
-      this.downloadLink = await this.documentService.processFile(this.selectedFile, false); // Get the Blob from service
+      this.downloadLink = await this.documentService.processFile(this.selectedFile, true); // Get the Blob from service
 
       // Ensure that you call the download logic after processing
       if (this.downloadLink) {
@@ -32,7 +32,7 @@ export class UploadComponent {
         const url = window.URL.createObjectURL(this.downloadLink);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Processed_${this.selectedFile.name}`; // Correct file name format
+        a.download = 'processed-document.docx'; // Set the default file name
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
