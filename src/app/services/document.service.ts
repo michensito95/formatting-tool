@@ -13,149 +13,115 @@ export class DocumentService {
   // Method to process course document formatting
   processCourseDocument(elements: HTMLElement[]): Paragraph[] {
     const paragraphs: Paragraph[] = [];
-    let lastH2Text: string | null = null; // Store the last processed H2 text
-    let lastH3Text: string | null = null; // Store the last processed H3 text
-    let currentWordCount = 0; // Track the current word count
-    let currentH5Text: string | null = null; // Store the current H5 text for repetition
+    let lastH2Text: string | null = null;
+    let lastH3Text: string | null = null;
+    let currentWordCount = 0;
   
-    // Iterate over each HTML element
+    const addH5AfterWordCount = (subtitle: string | null) => {
+      if (subtitle && currentWordCount >= 200) {
+        paragraphs.push(new Paragraph({
+          text: `${subtitle};Y;N;VR;;Y;`,
+          heading: HeadingLevel.HEADING_5,
+        }));
+        currentWordCount = 0; // Reset word count
+      }
+    };
+  
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
-      console.log("Processing element:", element); // Log the element being processed
+      const text = (element as HTMLElement).innerText; // Cast to HTMLElement
   
-      const paragraphOptions: any = {
-        text: element.innerText, // Default text content
-      };
-  
-      // Apply heading levels based on the tag
       switch (element.tagName) {
         case 'H1':
           paragraphs.push(new Paragraph({
-            text: element.innerText,
+            text,
             heading: HeadingLevel.HEADING_1,
           }));
           break;
-          
-        case 'H2': // Process H2 and generate corresponding H5
-          lastH2Text = element.innerText; // Store the last processed H2 text
-          currentH5Text = `${lastH2Text};Y;N;N;VR;;Y;`; // H5 text derived from H2
+  
+        case 'H2':
+          lastH2Text = text;
+          lastH3Text = null; // Reset H3 when a new H2 starts
           paragraphs.push(new Paragraph({
             text: lastH2Text,
             heading: HeadingLevel.HEADING_2,
           }));
-          // Add the H5 for the H2
           paragraphs.push(new Paragraph({
-            text: currentH5Text,
+            text: `${lastH2Text};Y;N;N;VR;;Y;`,
             heading: HeadingLevel.HEADING_5,
           }));
-          currentWordCount = 0; // Reset the word count for the new section
+          currentWordCount = 0; // Reset word count
           break;
   
-        case 'H3': // Process H3 and generate corresponding H5
-          if (lastH3Text !== element.innerText) {
-            lastH3Text = element.innerText; // Store the last processed H3 text
-            paragraphs.push(new Paragraph({
-              text: lastH3Text,
-              heading: HeadingLevel.HEADING_3,
-            }));
-            // Add the corresponding H5 based on the last processed H3
-            paragraphs.push(new Paragraph({
-              text: `${lastH3Text};Y;N;N;VR;;Y;`, // H5 text derived from H3 with YNN format
-              heading: HeadingLevel.HEADING_5,
-            }));
-            currentWordCount = 0; // Reset the word count for the new section
-          }
-          break;
-  
-        case 'H5': // Handle H5 elements (titles inside content objects)
-          // Format H5 text: if it includes "Activity", don't append the YNN string
-          currentH5Text = element.innerText.includes('Activity')
-            ? element.innerText
-            : `${element.innerText};Y;N;VR;;Y;`; // Append YNN method
-  
-          // Split the H5 into words and check if it exceeds 200 words
-          const wordsInH5 = currentH5Text.trim().split(/\s+/); // Split into words
-          const totalH5Words = wordsInH5.length;
-  
-          // If the H5 text exceeds 200 words, split it
-          if (totalH5Words > 200) {
-            let chunkStart = 0;
-            // Split the H5 text into chunks of 200 words
-            while (chunkStart < wordsInH5.length) {
-              const chunk = wordsInH5.slice(chunkStart, chunkStart + 200).join(' '); // Join words back into text
-  
-              // Add the chunk as a paragraph
-              paragraphs.push(new Paragraph({
-                text: chunk, // Chunk of 200 words
-              }));
-  
-              // Add the H5 text after the chunk (repeat the H5)
-              paragraphs.push(new Paragraph({
-                text: currentH5Text, // Repeating the full H5 text after each chunk
-                heading: HeadingLevel.HEADING_5,
-              }));
-  
-              chunkStart += 200; // Move to the next chunk of 200 words
-            }
-          } else {
-            // If it's less than 200 words, just add the H5 as normal
-            paragraphs.push(new Paragraph({
-              text: currentH5Text, // Single H5
-              heading: HeadingLevel.HEADING_5,
-            }));
-          }
-          break;
-  
-        case 'UL': // Handle unordered lists (ul)
-          const ulItems = Array.from(element.children);
-          ulItems.forEach((li) => {
-            if (li.tagName === 'LI') {
-              const listItem = li as HTMLElement; // Cast li to HTMLElement
-              paragraphs.push(new Paragraph({
-                text: `• ${listItem.innerText}`, // Bullet point with a bullet symbol
-              }));
-            }
-          });
-          break;
-  
-        case 'OL': // Handle ordered lists (ol)
-          const olItems = Array.from(element.children);
-          olItems.forEach((li, index) => {
-            if (li.tagName === 'LI') {
-              const listItem = li as HTMLElement; // Cast li to HTMLElement
-              paragraphs.push(new Paragraph({
-                text: `${index + 1}. ${listItem.innerText}`, // Numbered point
-              }));
-            }
-          });
-          break;
-  
-        case 'P': // Add regular paragraphs and count words
-          const wordsInParagraph = element.innerText.split(/\s+/).length;
-          currentWordCount += wordsInParagraph;
-  
+        case 'H3':
+          lastH3Text = text; // Set the last H3 for repetition
           paragraphs.push(new Paragraph({
-            text: element.innerText,
+            text: lastH3Text,
+            heading: HeadingLevel.HEADING_3,
           }));
+          paragraphs.push(new Paragraph({
+            text: `${lastH3Text};Y;N;N;VR;;Y;`,
+            heading: HeadingLevel.HEADING_5,
+          }));
+          currentWordCount = 0; // Reset word count
+          break;
   
-          // Check if we need to repeat the last H5 after every 200 words
-          if (currentH5Text && currentWordCount >= 200) {
-            paragraphs.push(new Paragraph({
-              text: currentH5Text,
-              heading: HeadingLevel.HEADING_5,
-            }));
-            currentWordCount = 0; // Reset word count after repeating the H5
-          }
+        case 'H5':
+          paragraphs.push(new Paragraph({
+            text: text.includes('Activity')
+              ? text
+              : `${text};Y;N;VR;;Y;`,
+            heading: HeadingLevel.HEADING_5,
+          }));
+          currentWordCount = 0; // Reset word count for new H5
+          break;
+  
+        case 'P': // Regular paragraphs
+          const wordsInParagraph = text.split(/\s+/).length;
+          currentWordCount += wordsInParagraph;
+          paragraphs.push(new Paragraph({ text }));
+          addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
+          break;
+  
+        case 'UL': // Unordered list
+          Array.from(element.children).forEach((li) => {
+            if (li instanceof HTMLElement) {
+              const listText = li.innerText; // Cast `li` to HTMLElement
+              paragraphs.push(new Paragraph({
+                text: `• ${listText}`,
+              }));
+              currentWordCount += listText.split(/\s+/).length;
+            }
+          });
+          addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
+          break;
+  
+        case 'OL': // Ordered list
+          Array.from(element.children).forEach((li, index) => {
+            if (li instanceof HTMLElement) {
+              const listText = li.innerText; // Cast `li` to HTMLElement
+              paragraphs.push(new Paragraph({
+                text: `${index + 1}. ${listText}`,
+              }));
+              currentWordCount += listText.split(/\s+/).length;
+            }
+          });
+          addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
           break;
   
         default:
-          console.warn("Unhandled element type:", element.tagName); // Warn for unhandled element types
+          console.warn("Unhandled element type:", element.tagName);
       }
     }
   
-    console.log("Generated Paragraphs:", paragraphs); // Log the generated paragraphs
-    return paragraphs; // Return the array of paragraphs
+    // Final check at the end of processing
+    addH5AfterWordCount(lastH3Text || lastH2Text);
+  
+    console.log("Generated Paragraphs:", paragraphs);
+    return paragraphs;
   }
+  
+  
   // Method to process the assessment document
   processAssessmentDocument(elements: HTMLElement[]): docx.Paragraph[] {
     const paragraphs: docx.Paragraph[] = [];
