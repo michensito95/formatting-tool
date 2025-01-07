@@ -125,97 +125,62 @@ export class DocumentService {
   // Method to process the assessment document
   processAssessmentDocument(elements: HTMLElement[]): docx.Paragraph[] {
     const paragraphs: docx.Paragraph[] = [];
-    let currentQuestion: string | null = null;
-    let answerCount = 0;
-
-    elements.forEach((element: HTMLElement, index: number) => {
-        let text = element.textContent?.trim() || ''; // Extract and trim text content
-        console.log(`Processing Element #${index}: ${text}`); // Debugging log
-
-        // Detect the assessment title (H9)
-        if (/assessment|quiz|evaluation|lesson|sección|módulo|examen/i.test(text)) {
+  
+    // Loop through all elements in the parsed HTML
+    elements.forEach((element: HTMLElement) => {
+      const text = element.textContent?.trim() || '';
+  
+      if (element.tagName === 'P') {
+        // Handling Questions (custom style H9)
+        if (text.startsWith('Question:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Question:', '').trim(),
+            style: 'CustomHeading9', // Apply custom style for H9 (Title)
+          }));
+        }
+        // Handling Answers (custom style H10)
+        else if (text.startsWith('Answer:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Answer:', '').trim(),
+            style: 'CustomHeading10', // Apply custom style for H10 (Answers)
+            bullet: { level: 0 }, // Bullet points for answers
+          }));
+        }
+        // Handling Feedback or Comments (custom style H11)
+        else if (text.startsWith('Feedback:') || text.startsWith('Comment:')) {
+          paragraphs.push(new docx.Paragraph({
+            text: text.replace('Feedback:', '').replace('Comment:', '').trim(),
+            style: 'CustomHeading11', // Apply custom style for H11 (Feedback)
+          }));
+        }
+      }
+      // Handle any unordered list (UL) and ordered list (OL) elements
+      else if (element.tagName === 'UL') {
+        const ulItems = Array.from(element.children);
+        ulItems.forEach((li) => {
+          if (li.tagName === 'LI') {
+            const listItem = li as HTMLElement;
             paragraphs.push(new docx.Paragraph({
-                text,
-                style: 'Heading9',
+              text: `• ${listItem.innerText}`, // Bullet point for each list item
             }));
-            return;
-        }
-
-        // Detect questions (H10)
-        if (/^\d+\./.test(text) || (element.tagName === 'OL' && element.children.length > 0)) {
-            // Log warning if fewer than 4 answers were found for the previous question
-            if (currentQuestion && answerCount < 4) {
-                console.warn(`Expected 4 answers but found ${answerCount} for question: ${currentQuestion}`);
-            }
-            currentQuestion = text;
-            answerCount = 0;
-
-            // For ordered lists, use the first item as the question text if present
-            if (element.tagName === 'OL' && element.children.length > 0) {
-                const listItem = element.children[0] as HTMLElement;
-                text = listItem.textContent?.trim() || ''; 
-            }
-
+          }
+        });
+      }
+      else if (element.tagName === 'OL') {
+        const olItems = Array.from(element.children);
+        olItems.forEach((li, index) => {
+          if (li.tagName === 'LI') {
+            const listItem = li as HTMLElement;
             paragraphs.push(new docx.Paragraph({
-                text: text.replace(/^\d+\./, '').trim(), // Remove numbering
-                style: 'Heading10',
+              text: `${index + 1}. ${listItem.innerText}`, // Numbered point
             }));
-            return;
-        }
-
-        // Detect answers (H11) based on list structure or lettered format (e.g., a., b., c., d.)
-        if ((element.tagName === 'UL' || element.tagName === 'OL' || /^[a-dA-D]\./i.test(text)) && currentQuestion) {
-            console.log(`Answer detected: ${text}`); // Debugging log for answers
-
-            // Check if answer is lettered (a., b., etc.)
-            const letteredAnswerMatch = text.match(/^[a-dA-D]\./i);
-            if (letteredAnswerMatch) {
-                const answerText = text.replace(/^[a-dA-D]\./i, '').trim();
-                paragraphs.push(new docx.Paragraph({
-                    text: `${letteredAnswerMatch[0].toUpperCase()} ${answerText}`, // Maintain lettered format
-                    style: 'Heading11',
-                    bullet: { level: 0 },
-                }));
-                answerCount++;
-            } else {
-                // Handle bullet points in a list
-                Array.from(element.children).forEach((li) => {
-                    const answerText = (li as HTMLElement).textContent?.trim() || '';
-                    if (answerText && answerCount < 4) {
-                        paragraphs.push(new docx.Paragraph({
-                            text: answerText,
-                            style: 'Heading11',
-                            bullet: { level: 0 },
-                        }));
-                        answerCount++;
-                    }
-                });
-            }
-            return;
-        }
-
-        // Detect feedback sections (H12) if "Feedback" is present
-        const feedbackMatch = text.match(/feedback:\s*(.*)/i);
-        if (feedbackMatch) {
-            const feedbackContent = feedbackMatch[1].trim();
-            paragraphs.push(new docx.Paragraph({
-                text: `Feedback: ${feedbackContent}`,
-                style: 'Heading12',
-            }));
-            return;
-        }
+          }
+        });
+      }
     });
-
-    // Log warning if the last question has fewer than 4 answers
-    if (currentQuestion && answerCount < 4) {
-        console.warn(`Expected 4 answers but found ${answerCount} for question: ${currentQuestion}`);
-    }
-
+  
     return paragraphs;
-}
-
-
-
+  }
   generateAssessmentDocument(paragraphs: docx.Paragraph[]): docx.Document {
     return new docx.Document({
       styles: {
@@ -260,8 +225,7 @@ export class DocumentService {
   }
   
   // Method to process the file and format it as a docx document
-
-processFile(file: File, isAssessment: boolean): Promise<Blob> {
+  processFile(file: File, isAssessment: boolean): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = (e: any) => {
@@ -285,51 +249,10 @@ processFile(file: File, isAssessment: boolean): Promise<Blob> {
                         ? this.processAssessmentDocument(elements)
                         : this.processCourseDocument(elements);
 
-                    // Define styles with a default style configuration
-                    const docStyles = {
-                        default: {
-                            document: {
-                                run: {
-                                    font: "Calibri", // Set the default font to Calibri
-                                    size: 24, // 12pt
-                                },
-                            },
-                        },
-                        paragraphStyles: [
-                            {
-                                id: "NormalText",
-                                name: "Normal Text",
-                                run: {
-                                    font: "Calibri",
-                                    size: 24, // 12pt
-                                },
-                                paragraph: {
-                                    alignment: docx.AlignmentType.LEFT,
-                                },
-                            },
-                            {
-                                id: "TitleText",
-                                name: "Title Text",
-                                run: {
-                                    bold: true,
-                                    font: "Calibri",
-                                    size: 32, // 16pt for title
-                                },
-                                paragraph: {
-                                    alignment: docx.AlignmentType.CENTER,
-                                },
-                            },
-                        ],
-                    };
-
-                    // Prepare docx document depending on assessment or course
-                    let docxDocument: docx.Document;
-
-                    if (isAssessment) {
-                        docxDocument = this.generateAssessmentDocument(paragraphs);  // Custom function for assessment documents
-                    } else {
-                        docxDocument = new docx.Document({
-                            styles: docStyles,  // Applying the defined styles here
+                    // If the document is an assessment, use generateAssessmentDocument
+                    const docxDocument = isAssessment
+                        ? this.generateAssessmentDocument(paragraphs)  // Custom function for assessment documents
+                        : new docx.Document({
                             sections: [
                                 {
                                     properties: {},
@@ -337,9 +260,7 @@ processFile(file: File, isAssessment: boolean): Promise<Blob> {
                                 },
                             ],
                         });
-                    }
 
-                    // Convert docx document to a Blob
                     docx.Packer.toBlob(docxDocument).then((blob: Blob) => {
                         console.log("Generated Blob:", blob); // Log Blob details
                         resolve(blob);
@@ -351,6 +272,7 @@ processFile(file: File, isAssessment: boolean): Promise<Blob> {
         reader.readAsArrayBuffer(file);
     });
 }
+
 
 
   // Method to download the formatted document
