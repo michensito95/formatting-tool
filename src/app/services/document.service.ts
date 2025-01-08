@@ -125,62 +125,95 @@ export class DocumentService {
   // Method to process the assessment document
   processAssessmentDocument(elements: HTMLElement[]): docx.Paragraph[] {
     const paragraphs: docx.Paragraph[] = [];
-  
-    // Loop through all elements in the parsed HTML
-    elements.forEach((element: HTMLElement) => {
-      const text = element.textContent?.trim() || '';
-  
-      if (element.tagName === 'P') {
-        // Handling Questions (custom style H9)
-        if (text.startsWith('Question:')) {
-          paragraphs.push(new docx.Paragraph({
-            text: text.replace('Question:', '').trim(),
-            style: 'CustomHeading9', // Apply custom style for H9 (Title)
-          }));
-        }
-        // Handling Answers (custom style H10)
-        else if (text.startsWith('Answer:')) {
-          paragraphs.push(new docx.Paragraph({
-            text: text.replace('Answer:', '').trim(),
-            style: 'CustomHeading10', // Apply custom style for H10 (Answers)
-            bullet: { level: 0 }, // Bullet points for answers
-          }));
-        }
-        // Handling Feedback or Comments (custom style H11)
-        else if (text.startsWith('Feedback:') || text.startsWith('Comment:')) {
-          paragraphs.push(new docx.Paragraph({
-            text: text.replace('Feedback:', '').replace('Comment:', '').trim(),
-            style: 'CustomHeading11', // Apply custom style for H11 (Feedback)
-          }));
-        }
-      }
-      // Handle any unordered list (UL) and ordered list (OL) elements
-      else if (element.tagName === 'UL') {
-        const ulItems = Array.from(element.children);
-        ulItems.forEach((li) => {
-          if (li.tagName === 'LI') {
-            const listItem = li as HTMLElement;
+    let currentQuestion: string | null = null;
+    let answerCount = 0;
+
+    elements.forEach((element: HTMLElement, index: number) => {
+        let text = element.textContent?.trim() || ''; // Extract and trim text content
+        console.log(`Processing Element #${index}: ${text}`); // Debugging log
+
+        // Detect the assessment title (H9)
+        if (/assessment|quiz|evaluation|lesson|sección|módulo|examen/i.test(text)) {
             paragraphs.push(new docx.Paragraph({
-              text: `• ${listItem.innerText}`, // Bullet point for each list item
+                text,
+                style: 'Heading9',
             }));
-          }
-        });
-      }
-      else if (element.tagName === 'OL') {
-        const olItems = Array.from(element.children);
-        olItems.forEach((li, index) => {
-          if (li.tagName === 'LI') {
-            const listItem = li as HTMLElement;
+            return;
+        }
+
+        // Detect questions (H10)
+        if (/^\d+\./.test(text) || (element.tagName === 'OL' && element.children.length > 0)) {
+            // Log warning if fewer than 4 answers were found for the previous question
+            if (currentQuestion && answerCount < 4) {
+                console.warn(`Expected 4 answers but found ${answerCount} for question: ${currentQuestion}`);
+            }
+            currentQuestion = text;
+            answerCount = 0;
+
+            // For ordered lists, use the first item as the question text if present
+            if (element.tagName === 'OL' && element.children.length > 0) {
+                const listItem = element.children[0] as HTMLElement;
+                text = listItem.textContent?.trim() || ''; 
+            }
+
             paragraphs.push(new docx.Paragraph({
-              text: `${index + 1}. ${listItem.innerText}`, // Numbered point
+                text: text.replace(/^\d+\./, '').trim(), // Remove numbering
+                style: 'Heading10',
             }));
-          }
-        });
-      }
+            return;
+        }
+
+        // Detect answers (H11) based on list structure or lettered format (e.g., a., b., c., d.)
+        if ((element.tagName === 'UL' || element.tagName === 'OL' || /^[a-dA-D]\./i.test(text)) && currentQuestion) {
+            console.log(`Answer detected: ${text}`); // Debugging log for answers
+
+            // Check if answer is lettered (a., b., etc.)
+            const letteredAnswerMatch = text.match(/^[a-dA-D]\./i);
+            if (letteredAnswerMatch) {
+                const answerText = text.replace(/^[a-dA-D]\./i, '').trim();
+                paragraphs.push(new docx.Paragraph({
+                    text: `${letteredAnswerMatch[0].toUpperCase()} ${answerText}`, // Maintain lettered format
+                    style: 'Heading11',
+                    bullet: { level: 0 },
+                }));
+                answerCount++;
+            } else {
+                // Handle bullet points in a list
+                Array.from(element.children).forEach((li) => {
+                    const answerText = (li as HTMLElement).textContent?.trim() || '';
+                    if (answerText && answerCount < 4) {
+                        paragraphs.push(new docx.Paragraph({
+                            text: answerText,
+                            style: 'Heading11',
+                            bullet: { level: 0 },
+                        }));
+                        answerCount++;
+                    }
+                });
+            }
+            return;
+        }
+
+        // Detect feedback sections (H12) if "Feedback" is present
+        const feedbackMatch = text.match(/feedback:\s*(.*)/i);
+        if (feedbackMatch) {
+            const feedbackContent = feedbackMatch[1].trim();
+            paragraphs.push(new docx.Paragraph({
+                text: `Feedback: ${feedbackContent}`,
+                style: 'Heading12',
+            }));
+            return;
+        }
     });
-  
+
+    // Log warning if the last question has fewer than 4 answers
+    if (currentQuestion && answerCount < 4) {
+        console.warn(`Expected 4 answers but found ${answerCount} for question: ${currentQuestion}`);
+    }
+
     return paragraphs;
-  }
+}
+
   generateAssessmentDocument(paragraphs: docx.Paragraph[]): docx.Document {
     return new docx.Document({
       styles: {
