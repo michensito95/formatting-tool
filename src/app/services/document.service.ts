@@ -47,7 +47,7 @@ export class DocumentService {
             heading: HeadingLevel.HEADING_2,
           }));
           paragraphs.push(new Paragraph({
-            text: `${lastH2Text};Y;N;N;VR;;Y;`,
+            text: `${lastH2Text};Y;N;VR;;Y;`,
             heading: HeadingLevel.HEADING_5,
           }));
           currentWordCount = 0; // Reset word count
