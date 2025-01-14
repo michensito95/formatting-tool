@@ -20,7 +20,7 @@ export class DocumentService {
     const addH5AfterWordCount = (subtitle: string | null) => {
       if (subtitle && currentWordCount >= 200) {
         paragraphs.push(new Paragraph({
-          text: `${subtitle};Y;N;VR;;Y;`,
+          text: `${subtitle};Y;N;VR;;N;`,
           heading: HeadingLevel.HEADING_5,
         }));
         currentWordCount = 0; // Reset word count
