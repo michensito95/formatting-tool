@@ -82,7 +82,7 @@ export class DocumentService {
           paragraphs.push(new Paragraph({ text: "" })); // No space after H5
           break;
 
-        case 'P': // Regular paragraphs
+        case 'P': // Regular paragraphs (non-list text)
           paragraphs.push(new Paragraph({ text }));
           paragraphs.push(new Paragraph({ text: "\n" })); // Shift+Enter space after each paragraph
           const wordsInParagraph = text.split(/\s+/).length;
@@ -125,6 +125,7 @@ export class DocumentService {
     console.log("Generated Paragraphs:", paragraphs);
     return paragraphs;
   }
+
 
 
   // Method to process the assessment document
