@@ -16,29 +16,33 @@ export class DocumentService {
     let lastH2Text: string | null = null;
     let lastH3Text: string | null = null;
     let currentWordCount = 0;
-  
+
     const addH5AfterWordCount = (subtitle: string | null) => {
       if (subtitle && currentWordCount >= 200) {
         paragraphs.push(new Paragraph({
           text: `${subtitle};Y;N;VR;;N;`,
           heading: HeadingLevel.HEADING_5,
         }));
+        paragraphs.push(new Paragraph({ text: "" })); // No space after H5
         currentWordCount = 0; // Reset word count
       }
     };
-  
+
     for (let i = 0; i < elements.length; i++) {
       const element = elements[i];
-      const text = (element as HTMLElement).innerText; // Cast to HTMLElement
-  
+      const text = (element as HTMLElement).innerText.trim(); // Trim whitespace from text
+
+      if (!text) continue; // Skip empty or whitespace-only elements
+
       switch (element.tagName) {
         case 'H1':
           paragraphs.push(new Paragraph({
             text,
             heading: HeadingLevel.HEADING_1,
           }));
+          paragraphs.push(new Paragraph({ text: "" })); // Shift+Enter space after H1
           break;
-  
+
         case 'H2':
           lastH2Text = text;
           lastH3Text = null; // Reset H3 when a new H2 starts
@@ -50,9 +54,10 @@ export class DocumentService {
             text: `${lastH2Text};Y;N;VR;;Y;`,
             heading: HeadingLevel.HEADING_5,
           }));
+          paragraphs.push(new Paragraph({ text: "" })); // Shift+Enter space after H2
           currentWordCount = 0; // Reset word count
           break;
-  
+
         case 'H3':
           lastH3Text = text; // Set the last H3 for repetition
           paragraphs.push(new Paragraph({
@@ -63,9 +68,10 @@ export class DocumentService {
             text: `${lastH3Text};Y;N;VR;;Y;`,
             heading: HeadingLevel.HEADING_5,
           }));
+          paragraphs.push(new Paragraph({ text: "" })); // Shift+Enter space after H3
           currentWordCount = 0; // Reset word count
           break;
-  
+
         case 'H5':
           paragraphs.push(new Paragraph({
             text: text.includes('Activity')
@@ -73,55 +79,54 @@ export class DocumentService {
               : `${text};Y;N;VR;;Y;`,
             heading: HeadingLevel.HEADING_5,
           }));
-          currentWordCount = 0; // Reset word count for new H5
+          paragraphs.push(new Paragraph({ text: "" })); // No space after H5
           break;
-  
+
         case 'P': // Regular paragraphs
+          paragraphs.push(new Paragraph({ text }));
+          paragraphs.push(new Paragraph({ text: "\n" })); // Shift+Enter space after each paragraph
           const wordsInParagraph = text.split(/\s+/).length;
           currentWordCount += wordsInParagraph;
-          paragraphs.push(new Paragraph({ text }));
           addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
           break;
-  
+
         case 'UL': // Unordered list
           Array.from(element.children).forEach((li) => {
             if (li instanceof HTMLElement) {
-              const listText = li.innerText; // Cast `li` to HTMLElement
+              const listText = li.innerText.trim();
               paragraphs.push(new Paragraph({
                 text: `• ${listText}`,
               }));
-              currentWordCount += listText.split(/\s+/).length;
             }
           });
-          addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
+          paragraphs.push(new Paragraph({ text: "" })); // No space after each list item
           break;
-  
+
         case 'OL': // Ordered list
           Array.from(element.children).forEach((li, index) => {
             if (li instanceof HTMLElement) {
-              const listText = li.innerText; // Cast `li` to HTMLElement
+              const listText = li.innerText.trim();
               paragraphs.push(new Paragraph({
                 text: `${index + 1}. ${listText}`,
               }));
-              currentWordCount += listText.split(/\s+/).length;
             }
           });
-          addH5AfterWordCount(lastH3Text || lastH2Text); // Use H3 or H2 for repetition
+          paragraphs.push(new Paragraph({ text: "" })); // No space after each list item
           break;
-  
+
         default:
           console.warn("Unhandled element type:", element.tagName);
       }
     }
-  
+
     // Final check at the end of processing
     addH5AfterWordCount(lastH3Text || lastH2Text);
-  
+
     console.log("Generated Paragraphs:", paragraphs);
     return paragraphs;
   }
-  
-  
+
+
   // Method to process the assessment document
   processAssessmentDocument(elements: HTMLElement[]): docx.Paragraph[] {
     const paragraphs: docx.Paragraph[] = [];
