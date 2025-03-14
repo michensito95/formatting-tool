@@ -248,7 +248,7 @@ export class DocumentService {
           {
             id: 'Heading12',
             name: 'Heading 12',
-            basedOn: 'Heading4', // You can change this to whatever suits your hierarchy
+            basedOn: 'Heading4', 
             next: 'Normal',
             run: { font: 'Calibri', size: 18 },
         },
@@ -288,7 +288,7 @@ export class DocumentService {
                         ? this.processAssessmentDocument(elements)
                         : this.processCourseDocument(elements);
 
-                    // If the document is an assessment, use generateAssessmentDocument
+                
                     const docxDocument = isAssessment
                         ? this.generateAssessmentDocument(paragraphs)  // Custom function for assessment documents
                         : new docx.Document({

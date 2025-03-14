@@ -6,9 +6,9 @@ import { DocumentService } from '../services/document.service';
   templateUrl: './upload-assessment.component.html',
   styleUrls: ['./upload-assessment.component.css']
 })
-export class UploadAssessmentComponent {  // or UploadComponent
+export class UploadAssessmentComponent {  
   selectedFile: File | null = null;
-  downloadLink: Blob | null = null;  // Change type from string to Blob
+  downloadLink: Blob | null = null;  
 
   constructor(private documentService: DocumentService) { }
 
